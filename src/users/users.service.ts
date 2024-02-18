@@ -1,30 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './interfaces/user.interface';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './schemas/user.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersService {
-  public users: User[] = [];
-  create(createUserDto: CreateUserDto): CreateUserDto {
-    this.users.push(createUserDto);
-    return createUserDto;
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const createdUser = new this.userModel(createUserDto);
+    return createdUser.save();
   }
 
-  findAll(): User[] {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().lean();
   }
 
-  findOne(id: number): User {
-    return this.users[id];
+  async findOne(id: string): Promise<User> {
+    return this.userModel.findById({ _id: id }).lean();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    return this.userModel.updateOne({ _id: id }, updateUserDto).lean();
   }
 
-  remove(id: number) {
-    this.users.splice(id);
-    return `This action removes a #${id} user`;
+  async remove(id: string): Promise<User> {
+    return this.userModel.deleteOne({ _id: id }).lean();
   }
 }
