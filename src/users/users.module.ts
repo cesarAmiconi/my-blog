@@ -11,5 +11,6 @@ import { PasswordService } from './utils/password.service';
   ],
   controllers: [UsersController],
   providers: [UsersService, PasswordService],
+  exports: [UsersService],
 })
 export class UsersModule {}
