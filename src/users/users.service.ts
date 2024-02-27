@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    return this.userModel.findById({ _id: id }).lean();
+    return await this.userModel.findById({ _id: id }).lean();
   }
 
   async findOneByName(name: string): Promise<any> {
