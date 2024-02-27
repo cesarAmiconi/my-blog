@@ -5,14 +5,16 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   name: string;
 
   @Prop({ type: String, required: true })
   password: string;
 
-  @Prop({ type: Boolean, default: false }) // Para probar como lo guarda en la base de datos
+  @Prop({ type: Boolean, default: false })
   isAdmin: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ name: 1 });
