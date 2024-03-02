@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { PasswordService } from 'src/users/utils/password.service';
+import { PasswordService } from 'src/utils/password.service';
 import { ConfigService } from '@nestjs/config';
+import { ValidatedUser } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     return this.configService.get('JWT_SECRET');
   }
 
-  async validateUser(username: string, pass: string): Promise<any> {
+  async validateUser(username: string, pass: string): Promise<ValidatedUser> {
     const user = await this.usersService.findOneByName(username);
     if (
       user &&
@@ -25,14 +26,17 @@ export class AuthService {
     ) {
       return {
         username: user.name,
-        id: user._id,
+        userId: user._id,
       };
     }
-    return null;
+    throw new UnauthorizedException('Invalid username or password');
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.id };
+  async login(user: ValidatedUser) {
+    const payload = {
+      username: user.username,
+      userId: user.userId,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };

@@ -1,5 +1,5 @@
 export class CreateUserDto {
-  readonly name: string;
+  name: string;
   password: string;
   readonly isAdmin: boolean;
 }

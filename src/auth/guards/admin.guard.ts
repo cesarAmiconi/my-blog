@@ -11,8 +11,7 @@ export class AdminGuard implements CanActivate {
   constructor(private readonly usersService: UsersService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const userId = context.switchToHttp().getRequest().user.userId;
-    const user = await this.usersService.findOne(userId);
-    if (user && user.isAdmin) {
+    if (await this.usersService.isAdmin(userId)) {
       return true;
     }
     throw new ForbiddenException('You are not an admin!');
